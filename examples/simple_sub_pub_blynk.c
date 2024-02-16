@@ -10,8 +10,8 @@
 
 #include <mqtt.h>
 #include "templates/posix_sockets.h"
-//#define BROKER "blynk-qa.com"
-#define BROKER "broker.hivemq.com"
+#define BROKER "blynk-qa.com"
+//#define BROKER "broker.hivemq.com"
 #define PORT "1883"
 
 #define BLYNK_TEMPLATE_ID "TMPL898i3cltO"
@@ -107,20 +107,20 @@ int main(int argc, const char *argv[])
 
     }
 
-    mqtt_publish(&client, "ds/terminal", "Device connected", strlen("Device connected") + 1, MQTT_PUBLISH_QOS_0);
+    mqtt_publish(&client, "ds/terminal", "Device connected", strlen("Device connected") + 1, MQTT_PUBLISH_QOS_1);
 
     /* check for errors */
     if (client.error != MQTT_OK) {
         fprintf(stderr, "error: %s\n", mqtt_error_str(client.error));
         exit_example(EXIT_FAILURE, sockfd, &client_daemon);
     }
-
-    mqtt_subscribe(&client, "downlink/#", 0);
+    sleep(1);
+    mqtt_subscribe(&client, "downlink/#", 1);
     /* start publishing the time */
 
     printf("Press ENTER to publish the current time.\n");
     printf("Press CTRL-D (or any other key) to exit.\n\n");
-
+    sleep(1);
 /* Block for test if need loop after publish for subscribe */
 //    while(fgetc(stdin) != EOF);
 
@@ -138,7 +138,7 @@ int main(int argc, const char *argv[])
         printf("%s published : \"%s\"", argv[0], application_message);
 
         /* publish the time */
-        mqtt_publish(&client, "ds/uptime", application_message, strlen(application_message) + 1, MQTT_PUBLISH_QOS_0);
+        mqtt_publish(&client, "ds/uptime", application_message, strlen(application_message) + 1, MQTT_PUBLISH_QOS_1);
 
         /* check for errors */
         if (client.error != MQTT_OK) {
