@@ -1,0 +1,4 @@
+!#/bin/bash -ex
+
+rm -rf bin && mkdir bin && make bin/simple_sub_pub_blynk && ./bin/simple_sub_pub_blynk
+
