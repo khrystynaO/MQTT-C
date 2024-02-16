@@ -17,6 +17,12 @@ all: $(BINDIR) $(MQTT_C_UNITTESTS) $(MQTT_C_EXAMPLES)
 bin/simple_%: examples/simple_%.c $(MQTT_C_SOURCES)
 	$(CC) $(CFLAGS) $^ -lpthread $(MSFLAGS) -o $@
 
+bin/simple_%_%: examples/simple_%_%.c $(MQTT_C_SOURCES)
+	$(CC) $(CFLAGS) $^ -lpthread $(MSFLAGS) -o $@
+
+bin/simple_%_%_%: examples/simple_%_%_%.c $(MQTT_C_SOURCES)
+	$(CC) $(CFLAGS) $^ -lpthread $(MSFLAGS) -o $@
+
 bin/reconnect_%: examples/reconnect_%.c $(MQTT_C_SOURCES)
 	$(CC) $(CFLAGS) $^ -lpthread $(MSFLAGS) -o $@
 
@@ -37,3 +43,4 @@ clean:
 
 check: all
 	./$(MQTT_C_UNITTESTS)
+

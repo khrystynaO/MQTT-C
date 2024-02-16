@@ -1,7 +1,7 @@
 
 /**
  * @file
- * A simple program that subscribes to a topic.
+ * A simple program to that publishes the current time whenever ENTER is pressed.
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -13,7 +13,9 @@
 
 
 /**
- * @brief The function will be called whenever a PUBLISH message is received.
+ * @brief The function that would be called whenever a PUBLISH is received.
+ *
+ * @note This function is not used in this example.
  */
 void publish_callback(void** unused, struct mqtt_response_publish *published);
 
@@ -32,6 +34,9 @@ void* client_refresher(void* client);
  */
 void exit_example(int status, int sockfd, pthread_t *client_daemon);
 
+/**
+ * A simple program to that publishes the current time whenever ENTER is pressed.
+ */
 int main(int argc, const char *argv[])
 {
     const char* addr;
@@ -42,7 +47,7 @@ int main(int argc, const char *argv[])
     if (argc > 1) {
         addr = argv[1];
     } else {
-        addr = "test.mosquitto.org";
+        addr = "broker.hivemq.com";
     }
 
     /* get port number (argv[2] if present) */
@@ -92,16 +97,33 @@ int main(int argc, const char *argv[])
         exit_example(EXIT_FAILURE, sockfd, NULL);
 
     }
-
-    /* subscribe */
-    mqtt_subscribe(&client, topic, 0);
-
+    mqtt_subscribe(&client, "khrystynatopic/#", 0);
     /* start publishing the time */
-    printf("%s listening for '%s' messages.\n", argv[0], topic);
-    printf("Press CTRL-D to exit.\n\n");
+    printf("%s is ready to begin publishing the time.\n", argv[0]);
+    printf("Press ENTER to publish the current time.\n");
+    printf("Press CTRL-D (or any other key) to exit.\n\n");
+    while(fgetc(stdin) == '\n') {
+        /* get the current time */
+        time_t timer;
+        time(&timer);
+        struct tm* tm_info = localtime(&timer);
+        char timebuf[26];
+        strftime(timebuf, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    /* block */
-    while(fgetc(stdin) != EOF);
+        /* print a message */
+        char application_message[256];
+        snprintf(application_message, sizeof(application_message), "The time is %s", timebuf);
+        printf("%s published : \"%s\"", argv[0], application_message);
+
+        /* publish the time */
+        mqtt_publish(&client, topic, application_message, strlen(application_message) + 1, MQTT_PUBLISH_QOS_0);
+
+        /* check for errors */
+        if (client.error != MQTT_OK) {
+            fprintf(stderr, "error: %s\n", mqtt_error_str(client.error));
+            exit_example(EXIT_FAILURE, sockfd, &client_daemon);
+        }
+    }
 
     /* disconnect */
     printf("\n%s disconnecting from %s\n", argv[0], addr);
@@ -117,8 +139,6 @@ void exit_example(int status, int sockfd, pthread_t *client_daemon)
     if (client_daemon != NULL) pthread_cancel(*client_daemon);
     exit(status);
 }
-
-
 
 void publish_callback(void** unused, struct mqtt_response_publish *published)
 {
