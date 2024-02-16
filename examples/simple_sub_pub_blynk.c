@@ -10,13 +10,13 @@
 
 #include <mqtt.h>
 #include "templates/posix_sockets.h"
+//#define BROKER "blynk-qa.com"
+#define BROKER "broker.hivemq.com"
+#define PORT "1883"
 
-#define BROKER "xxxxxxxx.com"
-#define PORT "xxxx"
-
-#define BLYNK_TEMPLATE_ID "TMPLxxxxxxxxx"
+#define BLYNK_TEMPLATE_ID "TMPL898i3cltO"
 #define BLYNK_TEMPLATE_NAME "mqtt test"
-#define BLYNK_AUTH_TOKEN "AbO-xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#define BLYNK_AUTH_TOKEN "AbO-LutXidyQMGk6Gzk5GnHtk-aSvFsB"
 
 #define BLYNK_FIRMWARE_VERSION  "0.1.1"
 
@@ -120,6 +120,10 @@ int main(int argc, const char *argv[])
 
     printf("Press ENTER to publish the current time.\n");
     printf("Press CTRL-D (or any other key) to exit.\n\n");
+
+/* Block for test if need loop after publish for subscribe */
+//    while(fgetc(stdin) != EOF);
+
     while(fgetc(stdin) == '\n') {
         /* get the current time */
         time_t timer;
